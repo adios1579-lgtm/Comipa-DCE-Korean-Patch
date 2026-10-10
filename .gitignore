@@ -1,0 +1,6 @@
+/build/
+/releases/
+*.dll
+*.exe
+__pycache__/
+/publication.json
