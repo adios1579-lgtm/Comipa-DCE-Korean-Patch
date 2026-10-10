@@ -35,7 +35,7 @@ def publish(version):
     command('git','config','user.email',str(account['id'])+'+'+account['login']+'@users.noreply.github.com')
     command('git','config','credential.https://github.com.helper','')
     command('git','config','--add','credential.https://github.com.helper','!"'+str(GH).replace('\\','/')+'" auth git-credential')
-    allowed=['.gitignore','README.md','release-notes.md','배포자_사용설명.md','사용설명서.txt','업데이트_만들기.bat','build_release.py','validate_release.py','publish_release.py','verify_public.py','src','history','baseline.json','VERIFICATION.md']
+    allowed=['.gitignore','README.md','release-notes.md','배포자_사용설명.md','사용설명서.txt','업데이트_만들기.bat','build_release.py','validate_release.py','publish_release.py','verify_public.py','test_updater.py','src','history','baseline.json','VERIFICATION.md']
     for name in allowed:
         if (b.DIST/name).exists():command('git','add','--',name)
     staged=command('git','diff','--cached','--name-only').splitlines()

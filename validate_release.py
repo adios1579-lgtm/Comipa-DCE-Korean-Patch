@@ -63,7 +63,7 @@ def validate(version, mode, packages):
         prior=patch.patch_images('event.ar1')((ROOT/'testgame/vanilla/event.ar1').read_bytes(),p,str(GAME))
         prior_path=GAME/'event.ar1.release-test-link';prior_path.write_bytes(prior);os.replace(prior_path,GAME/'event.ar1');del prior
         # Compiled ComiPa engine from this port's earlier test build, never Canvas3 binaries.
-        shutil.copyfile(b.DIST/'ComipaUpdater.dll',GAME/'updates/ComipaUpdater.dll')
+        shutil.copyfile(b.BUILD/'fixture-engine.dll',GAME/'updates/ComipaUpdater.dll')
         report['predecessor_event']=b.sha(GAME/'event.ar1')
         report['predecessor_engine']=b.sha(GAME/'updates/ComipaUpdater.dll')
         run_check('upgrade-fixture',GAME,release/'update-manifest.json',packages or release)

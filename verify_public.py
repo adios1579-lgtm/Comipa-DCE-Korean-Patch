@@ -5,6 +5,12 @@ import subprocess
 import urllib.request
 import build_release as b
 
+def normalized(value):
+    # JavaScriptSerializer materializes absent optional Item.package as null.
+    if isinstance(value,dict):return {k:normalized(v) for k,v in value.items() if v is not None}
+    if isinstance(value,list):return [normalized(v) for v in value]
+    return value
+
 def main():
     record=b.load(b.DIST/'publication.json')
     result={}
@@ -21,7 +27,7 @@ def main():
     # The actual shipped C# engine reads latest and downloads/verifies the update ZIP.
     b.run([b.BUILD/'ReleaseCheck.exe','download',b.ROOT/'testgame/patched',output])
     fetched=b.load(output/'fetched-manifest.json')
-    if fetched!=b.load(b.DIST/'releases'/record['version']/'update-manifest.json'):raise ValueError('latest manifest 불일치')
+    if normalized(fetched)!=normalized(b.load(b.DIST/'releases'/record['version']/'update-manifest.json')):raise ValueError('latest manifest 불일치')
     record.update(public_assets_verified=result,latest_verified_by_shipped_engine=True)
     b.dump(b.DIST/'publication.json',record)
     b.dump(b.DIST/'published'/f'{record["version"]}.json',record)
