@@ -1,0 +1,84 @@
+{
+  "version": "1.4.0",
+  "base_version": "1.0.0",
+  "inventory": [
+    {
+      "path": "ComiPaRT.exe",
+      "size": 1220608,
+      "sha256": "88553b613b7f39c576b8d67e96653e4bcacdcf03d7761bf2f64b2e849512385b",
+      "generated": true
+    },
+    {
+      "path": "script.ar1",
+      "size": 6416218,
+      "sha256": "3d8378c903ad9442ed7cd27533c5b673358f287826fd5b7effb69e5fa2dbcb8d",
+      "generated": true
+    },
+    {
+      "path": "EventFile.TBL",
+      "size": 60800,
+      "sha256": "850cdfbcadc742b029c308543b7e177137fed44ef07f1e19c58342ed4a1441a8",
+      "generated": true
+    },
+    {
+      "path": "bg.ar1",
+      "size": 49923605,
+      "sha256": "0d4ff2462cb2d7c75f7a325f127c408d2535c94c56a5c51af4152061d5767824",
+      "generated": true
+    },
+    {
+      "path": "bustup.ar1",
+      "size": 69749640,
+      "sha256": "715d045538e9f87af776a5b416b3a8d6d2083b2ddc55b740687c6d5b57ae769d",
+      "generated": true
+    },
+    {
+      "path": "event.ar1",
+      "size": 231701910,
+      "sha256": "84443346fc53d4f5a2eba964f08874c1dc027e4efda629bae6509b87805630ad",
+      "generated": true
+    },
+    {
+      "path": "frame.ar1",
+      "size": 23595538,
+      "sha256": "0ba43f7488b96f7cab38c534fec82009f197de4406a7060af82294c637b42f0a",
+      "generated": true
+    },
+    {
+      "path": "voice.ar1",
+      "size": 628865211,
+      "sha256": "3167ec9ad66afee1c3b63d576e57ae370c54afe49c50de7b2838ff1e80ac5f72",
+      "generated": true
+    },
+    {
+      "path": "updates/PatchEngine.exe",
+      "size": 73470267,
+      "sha256": "01a8b7c58dfabf000d99b8fd464631dc720e1fa011434ce3de57748e743aa140",
+      "generated": false
+    },
+    {
+      "path": "updates/ComipaUpdater.dll",
+      "size": 47104,
+      "sha256": "b4652d43ad97244a60f46313ff5ae863a2a0e82ea90859a70c13f4d44c41c573",
+      "generated": false
+    },
+    {
+      "path": "updates/base-requirements.json",
+      "size": 2914,
+      "sha256": "5974c1955052c60623805abc8895057ae08a7b7eb1edabee3b542b8dbe86acdf",
+      "generated": false
+    },
+    {
+      "path": "updates/originals.json",
+      "size": 1504,
+      "sha256": "9de38abf89a85f4629773b9297ddde608a6db7f95f9fda664dfa698df6538638",
+      "generated": false
+    },
+    {
+      "path": "사용설명서.txt",
+      "size": 3561,
+      "sha256": "caf1919929780cd9af22cf7a57e1b9f488e68ecd71d07dd5dfbbff13129d9720",
+      "generated": false
+    }
+  ]
+}
