@@ -1,0 +1,49 @@
+{
+  "version": "1.2.0",
+  "display_version": "1.02",
+  "repository": "adios1579-lgtm/Comipa-DCE-Korean-Patch",
+  "tag": "v1.2.0",
+  "url": "https://github.com/adios1579-lgtm/Comipa-DCE-Korean-Patch/releases/tag/v1.2.0",
+  "assets": {
+    "Comipa_DCE_Korean_Patch_1.02.zip": {
+      "size": 73308001,
+      "sha256": "6e896d3397f3e2651c5fe3c1c0756fd918ddf074df7ede373a75e9e2e83ba1bb"
+    },
+    "comipa-update-1.2.0-001.zip": {
+      "size": 73298833,
+      "sha256": "fc10fa78e737ddcd69e57b8389bf2ef2b735949e49c7acbef82b39c1351916fd"
+    },
+    "update-manifest.json": {
+      "size": 4304,
+      "sha256": "4a8e40d2d09070af1eebca7858fa330a8681406a49ad71616fc1839be8852ac9"
+    },
+    "SHA256.json": {
+      "size": 440,
+      "sha256": "0a4a2970ed3704dbee7880d51ea563e6e4464376c29a7198f686f17a8b755b98"
+    }
+  },
+  "commit": "67c5f29fc37c7060a34336ebd1ce5d4c9556145a",
+  "public_assets_verified": {
+    "Comipa_DCE_Korean_Patch_1.02.zip": {
+      "size": 73308001,
+      "sha256": "6e896d3397f3e2651c5fe3c1c0756fd918ddf074df7ede373a75e9e2e83ba1bb",
+      "anonymous_download_matches": true
+    },
+    "comipa-update-1.2.0-001.zip": {
+      "size": 73298833,
+      "sha256": "fc10fa78e737ddcd69e57b8389bf2ef2b735949e49c7acbef82b39c1351916fd",
+      "anonymous_download_matches": true
+    },
+    "update-manifest.json": {
+      "size": 4304,
+      "sha256": "4a8e40d2d09070af1eebca7858fa330a8681406a49ad71616fc1839be8852ac9",
+      "anonymous_download_matches": true
+    },
+    "SHA256.json": {
+      "size": 440,
+      "sha256": "0a4a2970ed3704dbee7880d51ea563e6e4464376c29a7198f686f17a8b755b98",
+      "anonymous_download_matches": true
+    }
+  },
+  "latest_verified_by_shipped_engine": true
+}
