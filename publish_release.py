@@ -16,14 +16,16 @@ def command(*args):
 
 def publish(version):
     release=b.DIST/'releases'/version
+    display=b.display_version(version)
     sums=b.load(release/'SHA256.json')
     for name,info in sums.items():
         p=release/name
         if b.sha(p)!=info['sha256'] or p.stat().st_size!=info['size']:raise ValueError('배포 파일 변경 감지: '+name)
     for mode in ['install','upgrade']:
-        result=b.load(b.ROOT/'logs'/f'release_{mode}_100.json')
+        result=b.load(b.verification_path(version,mode))
         if result['version']!=version or not all(result[k] for k in ['all_managed_files_match','live_unchanged','saves_and_settings_unchanged','temporary_files_clean']):raise ValueError('검증 미완료: '+mode)
-    result=b.load(b.ROOT/'logs/release_upgrade_100.json')
+        if result.get('manifest_sha256')!=b.sha(release/'update-manifest.json') or result.get('engine_sha256')!=b.sha(b.PAYLOAD/'updates/ComipaUpdater.dll'):raise ValueError('검증 이후 배포 변경: '+mode)
+    result=b.load(b.verification_path(version,'upgrade'))
     if result.get('manifest_sha256')!=b.sha(release/'update-manifest.json'):raise ValueError('검증 이후 manifest 변경')
     expected=b.signature([b.DIST/'src/Updater.cs',b.DIST/'src/Bootstrap.cs',b.PATCH/'ComiPaRT.ico'])
     if b.load(b.BUILD/'tools-signature.json')!=expected:raise ValueError('업데이트 엔진 소스 변경 후 재빌드 필요')
@@ -33,7 +35,7 @@ def publish(version):
     command('git','config','user.name',account['login'])
     command('git','config','core.quotepath','false')
     command('git','config','user.email',str(account['id'])+'+'+account['login']+'@users.noreply.github.com')
-    command('git','config','credential.https://github.com.helper','')
+    command('git','config','--replace-all','credential.https://github.com.helper','')
     command('git','config','--add','credential.https://github.com.helper','!"'+str(GH).replace('\\','/')+'" auth git-credential')
     allowed=['.gitignore','README.md','release-notes.md','배포자_사용설명.md','사용설명서.txt','업데이트_만들기.bat','build_release.py','validate_release.py','publish_release.py','verify_public.py','test_updater.py','src','history','baseline.json','VERIFICATION.md']
     for name in allowed:
@@ -42,7 +44,7 @@ def publish(version):
     for name in staged:
         if not (name in allowed or name.startswith(('src/','history/'))):raise ValueError('허용하지 않은 공개 파일: '+name)
         if Path(name).suffix.lower() in ['.exe','.dll','.ar1','.zip','.7z']:raise ValueError('소스 커밋에 바이너리 포함')
-    if staged:command('git','commit','-m','Release ComiPa DCE Korean patch 1.00 with automatic updates')
+    if staged:command('git','commit','-m','Release ComiPa DCE Korean patch '+display)
     remote=subprocess.run([str(GH),'repo','view',b.REPOSITORY,'--json','nameWithOwner'],capture_output=True,text=True)
     if remote.returncode:
         command(GH,'repo','create',b.REPOSITORY,'--public','--description','코믹파티 DCE 스토리 모드 한글패치 · CG 한글화 · 자동 업데이트','--source',b.DIST,'--remote','origin','--push')
@@ -62,7 +64,7 @@ def publish(version):
         for path in [*(release/name for name in sums),release/'SHA256.json']:
             if path.name not in have:command(GH,'release','upload',tag,path,'--repo',b.REPOSITORY)
     else:
-        command(GH,'release','create',tag,*[release/name for name in sums],release/'SHA256.json','--repo',b.REPOSITORY,'--draft','--target','main','--title','코믹파티 DCE 한글패치 1.00','--notes-file',b.DIST/'release-notes.md')
+        command(GH,'release','create',tag,*[release/name for name in sums],release/'SHA256.json','--repo',b.REPOSITORY,'--draft','--target','main','--title','코믹파티 DCE 한글패치 '+display,'--notes-file',b.DIST/'release-notes.md')
     draft=json.loads(command(GH,'release','view',tag,'--repo',b.REPOSITORY,'--json','assets,isDraft,url'))
     wanted=dict(sums,**{'SHA256.json':{'size':(release/'SHA256.json').stat().st_size,'sha256':b.sha(release/'SHA256.json')}})
     if set(a['name'] for a in draft['assets'])!=set(wanted):raise ValueError('초안 자산 목록 불일치')
@@ -81,10 +83,10 @@ def publish(version):
     command(GH,'release','edit',tag,'--repo',b.REPOSITORY,'--draft=false','--latest')
     published=json.loads(command(GH,'release','view',tag,'--repo',b.REPOSITORY,'--json','url,isDraft'))
     if published['isDraft']:raise ValueError('공개 전환 확인 실패')
-    record=dict(version=version,display_version='1.00',repository=b.REPOSITORY,tag=tag,url=published['url'],assets=wanted,commit=command('git','rev-parse','HEAD'))
+    record=dict(version=version,display_version=display,repository=b.REPOSITORY,tag=tag,url=published['url'],assets=wanted,commit=command('git','rev-parse','HEAD'))
     b.dump(b.DIST/'published'/f'{version}.json',record)
     b.dump(b.DIST/'publication.json',record)
     print(json.dumps(record,ensure_ascii=False,indent=2))
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('--version',default='1.0.0');publish(ap.parse_args().version)
+    ap=argparse.ArgumentParser();ap.add_argument('--version',required=True);publish(ap.parse_args().version)

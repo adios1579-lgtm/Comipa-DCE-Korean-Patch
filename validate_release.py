@@ -33,8 +33,7 @@ def validate(version, mode, packages):
     saves={'live':protected(LIVE),'test':protected(GAME)}
     report=dict(version=version,mode=mode,manifest_sha256=b.sha(release/'update-manifest.json'),engine_sha256=b.sha(b.PAYLOAD/'updates/ComipaUpdater.dll'),actual_game_run=False,protected_before=saves,live_before=live)
     if mode=='install':
-        for f in manifest['inventory']:
-            if f['generated'] and b.sha(GAME/f['path'])!=f['sha256']:raise ValueError('시험본 변경 감지: '+f['path'])
+        run_check('check',GAME)
         # Reuse this test installation. Hardlinks avoid copying unmodified game data.
         for name in b.GAME:
             original=ROOT/'testgame/vanilla'/name
@@ -56,23 +55,14 @@ def validate(version, mode, packages):
         run_check('check',GAME)
         report['clean_install_and_same_content_registration']=True
     elif mode=='upgrade':
-        # Use a real pre-CG archive generated from the same supported original.
-        sys.path.insert(0,str(ROOT/'patch'))
-        import apply_story_mode as patch
-        p=patch.load_patch();p['_images']=patch.load_images();p['_images'].pop('cg_overlays',None)
-        prior=patch.patch_images('event.ar1')((ROOT/'testgame/vanilla/event.ar1').read_bytes(),p,str(GAME))
-        prior_path=GAME/'event.ar1.release-test-link';prior_path.write_bytes(prior);os.replace(prior_path,GAME/'event.ar1');del prior
-        # Compiled ComiPa engine from this port's earlier test build, never Canvas3 binaries.
-        shutil.copyfile(b.BUILD/'fixture-engine.dll',GAME/'updates/ComipaUpdater.dll')
-        report['predecessor_event']=b.sha(GAME/'event.ar1')
-        report['predecessor_engine']=b.sha(GAME/'updates/ComipaUpdater.dll')
-        run_check('upgrade-fixture',GAME,release/'update-manifest.json',packages or release)
-        for f in manifest['inventory']:
-            if b.sha(GAME/f['path'])!=f['sha256']:raise ValueError('업데이트 결과 불일치: '+f['path'])
-        # The synthetic successor number exists only in this isolated test, not on GitHub.
-        b.dump(GAME/'updates/installed.json',dict(schema=2,app_id=b.APP_ID,version=version,base_version=b.BASE_VERSION,files=manifest['inventory']))
+        state=b.load(GAME/'updates/installed.json')
+        if tuple(map(int,state['version'].split('.'))) >= tuple(map(int,version.split('.'))):
+            raise ValueError('업데이트 검사는 실제 이전 버전의 시험본에서 시작해야 합니다.')
         run_check('check',GAME)
-        report['prior_cg_and_engine_upgrade']=True
+        report['predecessor_version']=state['version']
+        report['predecessor_files']={f['path']:b.sha(GAME/f['path']) for f in state['files']}
+        run_check('upgrade',GAME,release/'update-manifest.json',packages or release)
+        report['published_predecessor_upgrade']=True
     for f in manifest['inventory']:
         path=GAME/f['path']
         if b.sha(path)!=f['sha256'] or path.stat().st_size!=f['size']:raise ValueError('최종 파일 불일치: '+f['path'])
@@ -80,8 +70,8 @@ def validate(version, mode, packages):
     assert saves=={'live':protected(LIVE),'test':protected(GAME)},'세이브/개인 설정 변경 감지'
     assert not (GAME/'.comipa-update').exists(),'임시 파일 정리 실패'
     report.update(all_managed_files_match=True,live_unchanged=True,saves_and_settings_unchanged=True,temporary_files_clean=True)
-    b.dump(ROOT/'logs'/('release_'+mode+'_100.json'),report)
+    b.dump(b.verification_path(version,mode),report)
     print(json.dumps(report,ensure_ascii=False,indent=2),flush=True)
 
 if __name__=='__main__':
-    ap=argparse.ArgumentParser();ap.add_argument('mode',choices=['install','upgrade']);ap.add_argument('--version',default='1.0.0');ap.add_argument('--packages',type=Path);a=ap.parse_args();validate(a.version,a.mode,a.packages)
+    ap=argparse.ArgumentParser();ap.add_argument('mode',choices=['install','upgrade']);ap.add_argument('--version',required=True);ap.add_argument('--packages',type=Path);a=ap.parse_args();validate(a.version,a.mode,a.packages)

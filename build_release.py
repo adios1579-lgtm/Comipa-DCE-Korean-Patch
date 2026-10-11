@@ -24,6 +24,13 @@ RUNTIME = ['updates/PatchEngine.exe','updates/ComipaUpdater.dll','updates/base-r
 BOOTSTRAPS = ['코믹파티_DCE_한글판.exe','한글패치_업데이트.exe','한글패치_설치.exe']
 REFS = ['System.Windows.Forms.dll','System.Drawing.dll','System.Web.Extensions.dll','System.IO.Compression.dll','System.IO.Compression.FileSystem.dll']
 
+def display_version(version):
+    major, minor, patch = version.split('.')
+    return major+'.'+minor.zfill(2)+('.'+patch if patch!='0' else '')
+
+def verification_path(version, mode):
+    return ROOT/'logs'/('release_'+mode+'_'+version.replace('.', '_')+'.json')
+
 def sha(path):
     with open(path,'rb') as f:
         return hashlib.file_digest(f,'sha256').hexdigest()
@@ -127,8 +134,7 @@ def build(version, notes, original):
     dump(out/'update-manifest.json',manifest)
     initial=dict(manifest,files=[dict(f) for f in metadata['inventory']]+[dict(f,package=package) for f in runtime],deleted=[])
     dump(PAYLOAD/'updates/initial-manifest.json',initial)
-    display=version.split('.')[0]+'.'+version.split('.')[1].zfill(2)
-    if version.split('.')[2]!='0':display+='.'+version.split('.')[2]
+    display=display_version(version)
     full=out/f'Comipa_DCE_Korean_Patch_{display}.zip'
     included=BOOTSTRAPS+RUNTIME+['updates/initial-manifest.json','updates/settings.json']
     with zipfile.ZipFile(full,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as z:
